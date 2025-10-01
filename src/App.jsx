@@ -1,14 +1,17 @@
 import { Route, Routes } from "react-router-dom";
-import Quiz from "./component/Quiz";
-import Results from "./component/Results";
-import Home from "./component/Home";
+import Home from "./pages/Home";
+import Quiz from "./pages/Quiz";
+import Results from "./pages/Results";
+import Layout from "./component/Layout";
 
 function App() {
   return (
     <Routes>
-      <Route path="/" element={<Home />} />
-      <Route path="/quiz/:nickname" element={<Quiz />} />
-      <Route path="/results/:nickname" element={<Results />} />
+      <Route path="/" element={<Layout />}>
+        <Route index element={<Home />} />
+        <Route path="/quiz/:nickname" element={<Quiz />} />
+        <Route path="/results/:nickname" element={<Results />} />
+      </Route>
     </Routes>
   );
 }
