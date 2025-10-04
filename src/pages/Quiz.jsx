@@ -1,25 +1,46 @@
-import { useState } from "react";
+import { useContext, useState } from "react";
 import data from "../mockData/questions.json";
+import CustomButton from "../components/CustomButton";
+import { useNavigate, useParams } from "react-router-dom";
+import RankingProvider from "../context/RankingContext";
 
 const Quiz = () => {
   const [quiz, setQuiz] = useState(data);
   const [currentId, setCurrentId] = useState(0);
-  const [answer, setAnswer] = useState("");
+  const [selectedOption, setSelectedOption] = useState("");
+  const [answerCount, setAnswerCount] = useState(0);
+  const { nickname } = useParams();
+  const navigate = useNavigate();
+  const { setResult } = useContext(RankingProvider);
 
   const currentQuiz = quiz[currentId];
+  const answer = currentQuiz.options[currentQuiz.answer];
 
-  const handleChange = (e) => {
-    setAnswer(e.target.value);
+  const handleOption = (e) => {
+    setSelectedOption(e.target.value);
   };
 
-  const handleClick = () => {
-    if (!answer) {
+  const handleNextQuiz = () => {
+    if (selectedOption === "") {
       alert("답을 선택해주세요!");
       return;
-    } else {
+    }
+
+    const isCorrect = selectedOption === answer;
+    if (isCorrect) {
+      setAnswerCount((prev) => prev + 1);
+    }
+
+    if (currentId + 1 < quiz.length) {
       setCurrentId((prev) => prev + 1);
+      setSelectedOption("");
+    } else {
+      setResult({ nickname, score: answerCount });
+      navigate(`/results/${nickname}`);
     }
   };
+
+  console.log(answerCount);
 
   return (
     <div className="flex flex-col gap-4 ">
@@ -37,19 +58,16 @@ const Quiz = () => {
               type="radio"
               name="quiz-option"
               value={option}
-              checked={option === answer}
-              onChange={handleChange}
+              checked={option === selectedOption}
+              onChange={handleOption}
             />
             {option}
           </label>
         ))}
       </div>
-      <button
-        onClick={handleClick}
-        className="mx-auto w-44 text-white bg-gray-400 py-1.5 px-5 rounded-sm hover:bg-gray-500 cursor-pointer"
-      >
+      <CustomButton onClick={handleNextQuiz} className={"mx-auto w-44 "}>
         NEXT
-      </button>
+      </CustomButton>
     </div>
   );
 };
