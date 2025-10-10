@@ -1,11 +1,21 @@
 import { createContext, useState } from "react";
 
-const RankingContext = createContext();
+export const RankingContext = createContext();
 
 const RankingProvider = ({ children }) => {
-  const [result, setResult] = useState({ nickName: "", score: 0 });
+  const [result, setResult] = useState([]);
+
+  const addRanking = (nickname, score) => {
+    setResult((prev) => {
+      const newList = [...prev, { nickname, score }];
+
+      newList.sort((a, b) => b.score - a.score);
+
+      return newList;
+    });
+  };
   return (
-    <UserInfoContext value={{ result, setResult }}>{children}</UserInfoContext>
+    <RankingContext value={{ result, addRanking }}>{children}</RankingContext>
   );
 };
 

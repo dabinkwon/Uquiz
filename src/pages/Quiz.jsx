@@ -2,7 +2,7 @@ import { useContext, useState } from "react";
 import data from "../mockData/questions.json";
 import CustomButton from "../components/CustomButton";
 import { useNavigate, useParams } from "react-router-dom";
-import RankingProvider from "../context/RankingContext";
+import { RankingContext } from "../context/RankingContext";
 
 const Quiz = () => {
   const [quiz, setQuiz] = useState(data);
@@ -11,7 +11,7 @@ const Quiz = () => {
   const [answerCount, setAnswerCount] = useState(0);
   const { nickname } = useParams();
   const navigate = useNavigate();
-  const { setResult } = useContext(RankingProvider);
+  const { addRanking } = useContext(RankingContext);
 
   const currentQuiz = quiz[currentId];
   const answer = currentQuiz.options[currentQuiz.answer];
@@ -27,20 +27,20 @@ const Quiz = () => {
     }
 
     const isCorrect = selectedOption === answer;
+    let newAnswerCount = answerCount;
     if (isCorrect) {
-      setAnswerCount((prev) => prev + 1);
+      newAnswerCount += 1;
     }
 
     if (currentId + 1 < quiz.length) {
       setCurrentId((prev) => prev + 1);
       setSelectedOption("");
+      setAnswerCount(newAnswerCount);
     } else {
-      setResult({ nickname, score: answerCount });
+      addRanking(nickname, answerCount);
       navigate(`/results/${nickname}`);
     }
   };
-
-  console.log(answerCount);
 
   return (
     <div className="flex flex-col gap-4 ">
@@ -65,7 +65,10 @@ const Quiz = () => {
           </label>
         ))}
       </div>
-      <CustomButton onClick={handleNextQuiz} className={"mx-auto w-44 "}>
+      <CustomButton
+        onClick={handleNextQuiz}
+        className={"bg-gray-400 mx-auto w-44 "}
+      >
         NEXT
       </CustomButton>
     </div>
